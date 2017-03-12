@@ -6,15 +6,15 @@ import org.junit.Test;
 public class ConsumerTest {
 
     @Test
-    public void testSender() {
-        KafkaEventServer kafkaEventServer = new KafkaEventServer();
-        kafkaEventServer.consume().take(1).subscribe(string -> {
+    public void testConsumer() {
+        KafkaEventConsumer kafkaEventConsumer = new KafkaEventConsumer("console");
+        kafkaEventConsumer.consume().takeLast(1).subscribe(string -> {
             System.out.println(string);
-            kafkaEventServer.complete();
+            kafkaEventConsumer.complete();
             Assert.assertTrue(true);
         });
         try {
-            Thread.sleep(100);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
