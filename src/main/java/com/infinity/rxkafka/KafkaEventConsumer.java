@@ -3,6 +3,7 @@ package com.infinity.rxkafka;
 import io.reactivex.Flowable;
 import io.reactivex.processors.FlowableProcessor;
 import io.reactivex.processors.PublishProcessor;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
@@ -32,6 +33,7 @@ public class KafkaEventConsumer implements EventConsumer {
                 Serdes.ByteArray().getClass().getName());
         properties.put(StreamsConfig.VALUE_SERDE_CLASS_CONFIG,
                 Serdes.String().getClass().getName());
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         subject = PublishProcessor.create();
         builder = new KStreamBuilder();
@@ -49,14 +51,13 @@ public class KafkaEventConsumer implements EventConsumer {
     }
 
     public void complete() {
+        streams.cleanUp();
         subject.onComplete();
         streams.close();
     }
 
     public static void main(String[] args) {
         KafkaEventConsumer kafkaEventConsumer = new KafkaEventConsumer("console");
-        kafkaEventConsumer.consume().subscribe(string -> {
-            System.out.println(string);
-        });
+        kafkaEventConsumer.consume().subscribe(string -> System.out.println(string));
     }
 }
