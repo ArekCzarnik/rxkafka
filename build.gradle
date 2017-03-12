@@ -1,0 +1,19 @@
+group 'com.rewe.digital.kafka'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile "io.reactivex.rxjava2:rxjava:2.0.7"
+    compile "org.apache.kafka:kafka-clients:0.10.2.0"
+    compile "org.apache.kafka:kafka-streams:0.10.2.0"
+}
