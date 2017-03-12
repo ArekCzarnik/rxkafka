@@ -1,6 +1,8 @@
 package com.infinity.rxkafka;
 
 import io.reactivex.Observable;
+import io.reactivex.processors.FlowableProcessor;
+import io.reactivex.processors.PublishProcessor;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -10,10 +12,8 @@ public class KafkaEventProducer implements EventProducer<String> {
 
     private final Properties properties;
     private final String topic;
-    private final ObservableQueue<String> observableQueue;
+    private final FlowableProcessor<String> subject;
     private final KafkaProducer kafkaProducer;
-    private final Observable<String> stream;
-
 
     public KafkaEventProducer(String topic) {
         properties = new Properties();
@@ -28,13 +28,12 @@ public class KafkaEventProducer implements EventProducer<String> {
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
+        subject = PublishProcessor.create();
+
         kafkaProducer = new KafkaProducer<>(properties);
         this.topic = topic;
 
-        this.observableQueue = new ObservableQueue<>();
-        this.stream = observableQueue.observe();
-
-        this.stream.subscribe(value -> {
+        subject.subscribe(value -> {
             kafkaProducer.send(new ProducerRecord<>(topic, value));
             kafkaProducer.flush();
         });
@@ -42,6 +41,6 @@ public class KafkaEventProducer implements EventProducer<String> {
 
     @Override
     public void publish(final String message) {
-        observableQueue.add(message);
+        subject.onNext(message);
     }
 }

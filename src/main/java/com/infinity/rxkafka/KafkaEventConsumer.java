@@ -51,9 +51,9 @@ public class KafkaEventConsumer implements EventConsumer {
     }
 
     public void complete() {
-        streams.cleanUp();
         subject.onComplete();
         streams.close();
+        streams.cleanUp();
     }
 
     public static void main(String[] args) {
