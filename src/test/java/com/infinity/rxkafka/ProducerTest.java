@@ -1,5 +1,7 @@
 package com.infinity.rxkafka;
 
+import io.reactivex.Flowable;
+import io.reactivex.schedulers.Schedulers;
 import org.junit.Test;
 
 public class ProducerTest {
@@ -10,5 +12,15 @@ public class ProducerTest {
         for (int i = 0; i < 100; i++) {
             eventProducer.publish("test"+i);
         }
+    }
+
+    @Test
+    public void testParallel() {
+        Flowable.range(1, 10)
+                .parallel()
+                .runOn(Schedulers.computation())
+                .map(v -> v * v)
+                .sequential()
+                .blockingSubscribe(System.out::println);
     }
 }
