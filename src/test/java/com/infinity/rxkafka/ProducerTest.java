@@ -2,6 +2,7 @@ package com.infinity.rxkafka;
 
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ProducerTest {
@@ -20,7 +21,7 @@ public class ProducerTest {
                 .parallel()
                 .runOn(Schedulers.computation())
                 .map(v -> v * v)
-                .sequential()
-                .blockingSubscribe(System.out::println);
+                .sequential().takeLast(1)
+                .blockingSubscribe(integer -> Assert.assertTrue(integer == 100));
     }
 }
