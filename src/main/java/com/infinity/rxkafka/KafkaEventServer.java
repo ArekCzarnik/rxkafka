@@ -29,15 +29,16 @@ public class KafkaEventServer implements EventConsumer {
         config.put(StreamsConfig.ZOOKEEPER_CONNECT_CONFIG, "localhost:2181");
         config.put(StreamsConfig.KEY_SERDE_CLASS_CONFIG,
                 Serdes.ByteArray().getClass().getName());
+        config.put(StreamsConfig.VALUE_SERDE_CLASS_CONFIG,
+                Serdes.String().getClass().getName());
 
 
         subject = PublishProcessor.create();
         builder = new KStreamBuilder();
-        stream = builder.stream("test1");
+        stream = builder.stream("console");
         stream.foreach((key, value) -> {
             subject.onNext(value);
         });
-        stream.to("sink");
         streams = new KafkaStreams(builder, config);
         streams.start();
     }
